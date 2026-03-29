@@ -21,22 +21,17 @@ install: venv
 	@echo "Installing project dependencies..."
 	$(PIP) install --upgrade pip
 	$(PIP) install -r requirements.txt
-	$(PIP) install mlx-2.2-py3-none-any.whl
 	@echo "Dependencies installed!"
 
 # Run the main script
 run:
-	@echo "Running A-Maze-ing..."
+	@echo "Running Call me Maybe..."
 	$(PYTHON) $(MAIN_SCRIPT) $(CONFIG_FILE)
 
 # Run the main script in debug mode using pdb
 debug:
 	@echo "Call me maybe in debug mode..."
 	$(PYTHON) -m pdb $(MAIN_SCRIPT) $(CONFIG_FILE)
-
-build:
-	@echo "Building wheel and sdist..."
-	python3 -m build
 
 # Clean temporary files and caches
 clean:
