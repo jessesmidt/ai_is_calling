@@ -1,42 +1,49 @@
-VENV = venv
-PYTHON := $(VENV)/bin/python3
-PIP := $(VENV)/bin/pip
-MAIN_SCRIPT := callme.py
-CONFIG_FILE := config.txt
+VENV = .venv
+PYTHON := uv run python -m src
 
+FUNCTIONS_DEF := data/input/functions_definition.json
+INPUT_FILE := data/input/function_calling_tests.json
+OUTPUT_FILE := data/output/results.json
 
-# Phony targets (targets that don't represent files)
-.PHONY: venv install run debug clean lint lint-strict help
+.PHONY: install run run-default debug clean lint lint-strict help test
 
-# Default target
 .DEFAULT_GOAL := help
 
-# Create virtual environment
 venv:
+	@echo "Creating virtual environment..."
 	python3 -m venv $(VENV)
-	@echo "Virtual environment created!"
+	@echo "Virtual environment created"
 
-# Install project dependencies
 install: venv
-	@echo "Installing project dependencies..."
-	$(PIP) install --upgrade pip
-	$(PIP) install -r requirements.txt
+	@echo "Installing call me maybe dependencies..."
+	uv sync --all-groups
 	@echo "Dependencies installed!"
 
-# Run the main script
 run:
-	@echo "Running Call me Maybe..."
-	$(PYTHON) $(MAIN_SCRIPT) $(CONFIG_FILE)
+	@echo "Running program with custom arguments..."
+	$(PYTHON) \
+		--functions_definition $(FUNCTIONS_DEF) \
+		--input $(INPUT_FILE) \
+		--output $(OUTPUT_FILE)
 
-# Run the main script in debug mode using pdb
+run-default:
+	@echo "Running program with default paths..."
+	$(PYTHON)
+
+test:
+	@echo "Running Pytest tests..."
+	uv run pytest
+
 debug:
-	@echo "Call me maybe in debug mode..."
-	$(PYTHON) -m pdb $(MAIN_SCRIPT) $(CONFIG_FILE)
+	@echo "Running in debug mode..."
+	uv run python -m pdb -m src \
+		--functions_definition $(FUNCTIONS_DEF) \
+		--input $(INPUT_FILE) \
+		--output $(OUTPUT_FILE)
 
-# Clean temporary files and caches
 clean:
 	@echo "Cleaning temporary files and caches..."
-	@if [ -d "venv" ]; then rm -rf venv && echo "Removed venv/"; fi
+	@if [ -d "$(VENV)" ]; then rm -rf $(VENV) && echo "Removed $(VENV)/"; fi
 	rm -rf dist/ build/ *.egg-info
 	find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
 	find . -type d -name ".mypy_cache" -exec rm -rf {} + 2>/dev/null || true
@@ -44,34 +51,30 @@ clean:
 	find . -type f -name "*.pyc" -delete 2>/dev/null || true
 	find . -type f -name "*.pyo" -delete 2>/dev/null || true
 	find . -type f -name "*.pyd" -delete 2>/dev/null || true
-	find . -type d -name "*.egg-info" -exec rm -rf {} + 2>/dev/null || true
-	find . -type d -name ".eggs" -exec rm -rf {} + 2>/dev/null || true
-	find . -type f -name "maze.txt" -delete 2>/dev/null || true
 	@echo "Cleanup complete!"
 
-# Run linting with flake8 and mypy (mandatory flags)
 lint:
 	@echo "Running flake8..."
-	$(PYTHON) -m flake8
-	@echo "Running mypy with required flags..."
-	$(PYTHON) -m mypy . --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs
+	uv run flake8
+	@echo "Running mypy..."
+	uv run mypy . --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs
 
-# Run strict linting (optional, enhanced checking)
 lint-strict:
 	@echo "Running flake8..."
-	$(PYTHON) -m flake8
-	@echo "Running mypy with strict mode..."
-	$(PYTHON) -m mypy . --strict
+	uv run flake8
+	@echo "Running mypy (strict)..."
+	uv run mypy . --strict
 
-# Display help information
 help:
 	@echo "A-Maze-ing Project - Available Make targets:"
 	@echo ""
-	@echo "  make install      - Install project dependencies"
-	@echo "  make run          - Execute the main script with default config"
-	@echo "  make debug        - Run the main script in debug mode (pdb)"
-	@echo "  make clean        - Remove temporary files and caches"
-	@echo "  make lint         - Run flake8 and mypy with required flags"
-	@echo "  make lint-strict  - Run flake8 and mypy with strict mode"
-	@echo "  make help         - Show this help message"
+	@echo "  make install       - Install dependencies using uv"
+	@echo "  make run           - Run with explicit input/output files"
+	@echo "  make run-default   - Run using default directories"
+	@echo "  make test          - Run pytest tests"
+	@echo "  make debug         - Run in debug mode"
+	@echo "  make clean         - Remove temporary files and caches"
+	@echo "  make lint          - Run flake8 and mypy"
+	@echo "  make lint-strict   - Run strict linting"
+	@echo "  make help          - Show this help message"
 	@echo ""

@@ -1,0 +1,36 @@
+[project]
+name = "callme"
+version = "0.1.0"
+description = "42 school network's 'call me maybe' project by JSmidt"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "huggingface-hub>=1.11.0",
+    "pydantic>=2.12.5",
+    "torch>=2.11.0",
+    "transformers>=5.5.4",
+]
+
+[dependency-groups]
+dev = [
+    "flake8>=7.3.0",
+    "mypy>=1.20.0",
+]
+
+[tool.uv]
+package = true
+
+[tool.uv.sources]
+torch = { index = "pytorch-cpu" }
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src", "llm_sdk"]
