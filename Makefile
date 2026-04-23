@@ -66,7 +66,7 @@ lint-strict:
 	uv run mypy . --strict
 
 help:
-	@echo "A-Maze-ing Project - Available Make targets:"
+	@echo "Call Me Maybe Project - Available Make targets:"
 	@echo ""
 	@echo "  make install       - Install dependencies using uv"
 	@echo "  make run           - Run with explicit input/output files"

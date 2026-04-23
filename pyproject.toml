@@ -28,6 +28,9 @@ name = "pytorch-cpu"
 url = "https://download.pytorch.org/whl/cpu"
 explicit = true
 
+[tool.mypy]
+exclude = ["llm_sdk/"]
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
